@@ -80,5 +80,5 @@ export const deleteBlog = async (
 
   if (!blog) return next(new AppError("Blog not found", 404));
 
-  response.status(204).json({ status: "success", data: null });
+  response.status(200).json({ status: "success", data: null });
 };

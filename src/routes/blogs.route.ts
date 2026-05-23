@@ -17,15 +17,15 @@ import {
 
 const router = express.Router();
 
-router.get("/blog/:id", validate(getBlogByIdSchema), getBlogById);
+router.get("/posts/:id", validate(getBlogByIdSchema), getBlogById);
 router.get(
-  "/blog/author/:author",
+  "/posts/author/:author",
   validate(getBlogByAuthorSchema),
   getBlogByAuthor,
 );
-router.patch("/blog/:id", validate(updateBlogSchema), updateBlog);
-router.delete("/blog/:id", validate(getBlogByIdSchema), deleteBlog);
-router.post("/blogs", validate(createBlogSchema), createBlog);
-router.get("/blogs", getAllBlogs);
+router.patch("/posts/:id", validate(updateBlogSchema), updateBlog);
+router.delete("/posts/:id", validate(getBlogByIdSchema), deleteBlog);
+router.post("/posts", validate(createBlogSchema), createBlog);
+router.get("/posts", getAllBlogs);
 
 export default router;
