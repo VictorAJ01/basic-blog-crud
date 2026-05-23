@@ -1,118 +1,84 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { Blog } from "../models/blog.model.js";
 import type { GetBlogByAuthorRequestPayload } from "../types/blogs.type.js";
+import { catchAsync } from "../utils/catch-async.js";
+import { AppError } from "../utils/app-error.js";
 
-export const createBlog = async (req: Request, res: Response) => {
-  try {
-    const { title, content, author } = req.body;
+export const createBlog = catchAsync(
+  async (request: Request, response: Response, next: NextFunction) => {
+    const existingBlog = await Blog.findOne({
+      title: request.body.title,
+      author: request.body.author,
+    });
 
-    const blog = await Blog.findOne({ title, author });
+    if (existingBlog)
+      return next(
+        new AppError("You have already created a blog with this title.", 409),
+      );
 
-    if (blog) {
-      return res
-        .status(409)
-        .json({ message: "You have already created a blog with this title." });
-    }
+    const newBlog = await Blog.create(request.body);
+    response.status(201).json({ status: "success", data: newBlog });
+  },
+);
 
-    const newBlog = await Blog.create({ title, content, author });
-    res.status(201).json(newBlog);
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-export const getAllBlogs = async (_: Request, res: Response) => {
-  try {
+export const getAllBlogs = catchAsync(
+  async (_: Request, response: Response) => {
     const blogs = await Blog.find({});
 
-    res.status(200).json({
+    response.status(200).json({
       status: "success",
       message: "Blogs retrieved successfully",
       data: blogs,
     });
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+  },
+);
 
-export const getBlogById = async (req: Request, res: Response) => {
-  try {
-    const id = req.params.id;
+export const getBlogById = catchAsync(
+  async (request: Request, response: Response, next: NextFunction) => {
+    const blog = await Blog.findById(request.params.id);
 
-    const blog = await Blog.findById(id);
+    if (!blog) return next(new AppError("Blog not found", 404));
 
-    if (!blog) {
-      return res
-        .status(404)
-        .json({ status: "error", message: "Blog not found" });
-    }
+    response.status(200).json({ status: "success", data: blog });
+  },
+);
 
-    res.status(200).json({ status: "success", data: blog });
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+export const getBlogByAuthor = catchAsync(
+  async (
+    request: Request<GetBlogByAuthorRequestPayload>,
+    response: Response,
+    next: NextFunction,
+  ) => {
+    const blog = await Blog.findOne({ author: request.params.author });
 
-export const getBlogByAuthor = async (
-  req: Request<GetBlogByAuthorRequestPayload>,
-  res: Response,
-) => {
-  try {
-    const author = req.params.author;
+    if (!blog) return next(new AppError("Blog not found", 404));
 
-    const blog = await Blog.findOne({ author });
+    response.status(200).json({ status: "success", data: blog });
+  },
+);
 
-    if (!blog) {
-      return res
-        .status(404)
-        .json({ status: "error", message: "Blog not found" });
-    }
-
-    res.status(200).json({ status: "success", data: blog });
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-// TODO: Fix Bug
-export const updateBlog = async (req: Request, res: Response) => {
-  try {
-    const id = req.params.id;
-
-    const { title, content } = req.body;
-
+export const updateBlog = catchAsync(
+  async (request: Request, response: Response, next: NextFunction) => {
     const updatedBlog = await Blog.findByIdAndUpdate(
-      id,
-      { title, content },
-      { new: true },
+      request.params.id,
+      request.body,
+      { new: true, runValidators: true },
     );
 
-    if (!updatedBlog) {
-      return res
-        .status(404)
-        .json({ status: "error", message: "Blog not found" });
-    }
+    if (!updatedBlog) return next(new AppError("Blog not found", 404));
 
-    res.status(200).json({ status: "success", data: updatedBlog });
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
+    response.status(200).json({ status: "success", data: updatedBlog });
+  },
+);
 
-export const deleteBlog = async (req: Request, res: Response) => {
-  try {
-    const id = req.params.id;
+export const deleteBlog = async (
+  request: Request,
+  response: Response,
+  next: NextFunction,
+) => {
+  const blog = await Blog.findByIdAndDelete(request.params.id);
 
-    const blog = await Blog.findByIdAndDelete(id);
+  if (!blog) return next(new AppError("Blog not found", 404));
 
-    if (!blog) {
-      return res
-        .status(404)
-        .json({ status: "error", message: "Blog not found" });
-    }
-
-    res.status(200).json({ status: "success", data: null });
-  } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
-  }
+  response.status(204).json({ status: "success", data: null });
 };
