@@ -27,8 +27,8 @@ A RESTful API for a personal blogging platform, built as part of the [Blogging P
 ### 1. Clone the repository
 
 ```bash
-git clone <your-repo-url>
-cd basic_blog_crud
+git clone https://github.com/VictorAJ01/basic-blog-crud
+cd basic-blog-crud
 ```
 
 ### 2. Install dependencies
