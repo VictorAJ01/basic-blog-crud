@@ -16,6 +16,13 @@ A RESTful API for a personal blogging platform, built as part of the [Blogging P
 - Request body validation with clear error messages
 - Consistent error handling and HTTP status codes
 - Get a single post, all posts, or posts by author
+- Filter posts by search term (title, content, or category)
+
+## API Documentation
+
+Interactive API documentation with request/response examples is published on Postman:
+
+**https://documenter.getpostman.com/view/19883385/2sBXwmPCFC**
 
 ## Prerequisites
 
@@ -64,10 +71,12 @@ npm start
 
 Base URL: `http://localhost:3000/api`
 
+> For full request/response examples, see the [Postman documentation](https://documenter.getpostman.com/view/19883385/2sBXwmPCFC).
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/posts` | Create a new blog post |
-| `GET` | `/posts` | Get all blog posts |
+| `GET` | `/posts` | Get all blog posts (supports `?term=` search) |
 | `GET` | `/posts/:id` | Get a single blog post by ID |
 | `PATCH` | `/posts/:id` | Update an existing blog post |
 | `DELETE` | `/posts/:id` | Delete a blog post |
