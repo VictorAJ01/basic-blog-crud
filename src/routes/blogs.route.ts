@@ -10,6 +10,7 @@ import {
 import { validate } from "../middlewares/validate.middleware.js";
 import {
   createBlogSchema,
+  getAllBlogsSchema,
   getBlogByAuthorSchema,
   getBlogByIdSchema,
   updateBlogSchema,
@@ -26,6 +27,6 @@ router.get(
 router.patch("/posts/:id", validate(updateBlogSchema), updateBlog);
 router.delete("/posts/:id", validate(getBlogByIdSchema), deleteBlog);
 router.post("/posts", validate(createBlogSchema), createBlog);
-router.get("/posts", getAllBlogs);
+router.get("/posts", validate(getAllBlogsSchema), getAllBlogs);
 
 export default router;

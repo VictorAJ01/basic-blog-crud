@@ -22,8 +22,21 @@ export const createBlog = catchAsync(
 );
 
 export const getAllBlogs = catchAsync(
-  async (_: Request, response: Response) => {
-    const blogs = await Blog.find({});
+  async (request: Request, response: Response) => {
+    const { term } = request.query;
+
+    const filter =
+      typeof term === "string" && term.trim()
+        ? {
+            $or: [
+              { title: { $regex: term, $options: "i" } },
+              { content: { $regex: term, $options: "i" } },
+              { category: { $regex: term, $options: "i" } },
+            ],
+          }
+        : {};
+
+    const blogs = await Blog.find(filter);
 
     response.status(200).json({
       status: "success",

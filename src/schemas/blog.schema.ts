@@ -22,6 +22,12 @@ export const createBlogSchema = z.object({
   }),
 });
 
+export const getAllBlogsSchema = z.object({
+  query: z.object({
+    term: z.string().trim().min(2).optional(),
+  }),
+});
+
 export const getBlogByIdSchema = z.object({
   params: z.object({
     id: z.string().regex(/^[0-9a-fA-F]{24}$/, {
@@ -65,8 +71,4 @@ export const updateBlogSchema = z.object({
       tags: z.array(z.string().min(2).max(100)).optional(),
     })
     .strict(),
-  query: z.object({
-    sortBy: z.enum(["createdAt", "updatedAt"]).optional(),
-    order: z.enum(["asc", "desc"]).optional(),
-  }),
 });
